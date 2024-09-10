@@ -1,10 +1,29 @@
-import React from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Banner from "../components/banner/Banner";
 import FeatureContainer from "../components/containers/FeatureContainer";
 import ProductContainer from "../components/containers/ProductContainer";
-import { dummData } from "../components/utils";
+import {toast} from 'react-hot-toast'
+import api from "../components/common/API";
 
 const Home = () => {
+  const [products, setProducts] = useState([]);
+  const ProductAPI = useCallback(async() => {
+    try {
+      const  response  = await api.get("/product/list");
+      if (response.status === 200) {
+
+        setProducts(response.data);
+      }
+    } catch (error) {
+      console.log("Error from Product API: ", error);
+      toast.error(error.message);
+    }
+  },[])
+
+  useEffect(() => {
+    ProductAPI();
+  }, []);
+
   return (
     <div>
       <Banner />
@@ -16,7 +35,7 @@ const Home = () => {
 
       <div className="lg:block flex justify-center">
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 mt-8 gap-4 mx-4 lg:mx-20 my-8">
-          {dummData.map((item, index) => (
+          {products?.data?.map((item, index) => (
             <ProductContainer key={index} data={item} />
           ))}
         </div>
