@@ -1,16 +1,23 @@
 import React, { useState } from "react";
 import CustomInput from "../../components/common/CustomInput";
 import CustomButton from "../../components/common/CustomButton";
-import { Link } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import api from "../../components/common/API";
 
 const Register = () => {
+  const navigate = useNavigate();
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rePassword, setRePassword] = useState("");
 
   // Email validation regex
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  const handleName = (event) => {
+    setName(event.target.value);
+  };
 
   const handleEmail = (event) => {
     setEmail(event.target.value);
@@ -24,9 +31,11 @@ const Register = () => {
     setRePassword(event.target.value);
   };
 
-  const handleRegisterSubmit = () => {
-    if (!email || !password || !rePassword) {
+  const handleRegisterSubmit = async () => {
+    if (!email || !email || !password || !rePassword) {
       toast.error("Please fill all fields");
+    } else if (name?.length < 3) {
+      toast.error("Name should be at least 3 characters long");
     } else if (!emailRegex.test(email)) {
       toast.error("Invalid email format");
     } else if (password.length < 8) {
@@ -34,16 +43,38 @@ const Register = () => {
     } else if (password !== rePassword) {
       toast.error("Passwords do not match");
     } else {
-      toast.success("Registration Successful");
-      // Submit the form data or further actions
+      try {
+        const { data } = await api.post("/auth/register", {
+          name,
+          email,
+          password,
+        });
+        toast.success(data?.message);
+      } catch (error) {
+        console.log(error);
+        if (error.response?.data?.error.includes("duplicate key error")) {
+          toast.error("Name already exists. Please choose a different name.");
+        } else {
+          toast.error(error.response?.data?.message || error.message);
+        }
+      }
     }
   };
+
   return (
     <div className="flex  mt-10 justify-center ">
       <div className="bg-white ">
         <h1 className="font-poppins text-center font-bold text-xl mb-4">
           Register
         </h1>
+        <CustomInput
+          value={name}
+          inputType={"text"}
+          onChange={handleName}
+          placeholder={"your name"}
+          label={"Name"}
+        />
+        <div className="my-2" />
         <CustomInput
           value={email}
           inputType={"email"}

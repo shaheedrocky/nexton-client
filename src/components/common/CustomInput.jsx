@@ -1,7 +1,14 @@
 import React from "react";
 import { CiSearch } from "react-icons/ci";
 
-const CustomInput = ({ inputType = 'text',type, placeholder, onChange, value, label }) => {
+const CustomInput = ({
+  inputType = "text",
+  type,
+  placeholder,
+  onChange,
+  value,
+  label,
+}) => {
   switch (type) {
     case "search":
       return (
@@ -16,9 +23,26 @@ const CustomInput = ({ inputType = 'text',type, placeholder, onChange, value, la
           />
         </div>
       );
+    case "textarea":
+      return (
+        <div>
+          <h2 className="text-black font-poppins text-xs font-medium mb-1">
+            {label}
+          </h2>
+          <div className="border px-2 py-1 w-[300px] rounded-md">
+            <textarea
+              type={inputType}
+              placeholder={placeholder}
+              value={value}
+              onChange={onChange}
+              className="border-none outline-none bg-transparent w-full font-poppins text-xs font-normal text-black"
+            />
+          </div>
+        </div>
+      );
     default:
       return (
-        <>
+        <div>
           <h2 className="text-black font-poppins text-xs font-medium mb-1">
             {label}
           </h2>
@@ -31,7 +55,7 @@ const CustomInput = ({ inputType = 'text',type, placeholder, onChange, value, la
               className="border-none outline-none bg-transparent w-full font-poppins text-xs font-normal text-black"
             />
           </div>
-        </>
+        </div>
       );
   }
 };

@@ -2,13 +2,22 @@ import React, { useState } from "react";
 import { Logo } from "../utils";
 import { IoPersonOutline, IoCartOutline } from "react-icons/io5";
 import CustomInput from "../common/CustomInput";
+import { useNavigate } from "react-router-dom";
 
 const Header = () => {
+  const navigate = useNavigate();
+
   const [search, setSearch] = useState("");
 
   const handleSearch = (event) => {
     setSearch(event.target.value);
   };
+
+  const handleLogout =()=>{
+    localStorage.removeItem('token')
+    navigate('/login');
+  }
+  
   return (
     <div className="flex items-center justify-between lg:px-20 px-4 border-b-[1px] py-2">
       {/* LOGO OF THE HEADER */}
@@ -33,6 +42,7 @@ const Header = () => {
             9
           </div>
         </div>
+        <button onClick={handleLogout}>Logout</button>
       </div>
     </div>
   );

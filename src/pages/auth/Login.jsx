@@ -1,10 +1,14 @@
 import React, { useState } from "react";
 import CustomInput from "../../components/common/CustomInput";
 import CustomButton from "../../components/common/CustomButton";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import api from "../../components/common/API";
+import store from "../../redux/store";
+import { setUser } from "../../redux/slices/userSlice";
 
 const Login = () => {
+  const navigate = useNavigate()
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -19,7 +23,7 @@ const Login = () => {
     setPassword(event.target.value);
   };
 
-  const handleLoginSubmit = () => {
+  const handleLoginSubmit = async() => {
     if (!email || !password ) {
       toast.error("Please fill all fields");
     } else if (!emailRegex.test(email)) {
@@ -27,7 +31,20 @@ const Login = () => {
     } else if (password.length < 8) {
       toast.error("Password must be at least 8 characters long");
     } else {
-      toast.success("Login Successful");
+      try {
+        const { data } = await api.post("/auth/login", {
+          email,
+          password,
+        });
+        console.log("Token: ", data);
+        toast.success(data?.message);
+        store.dispatch(setUser(data?.user))
+        localStorage.setItem("token", data?.user?.token);
+       
+      } catch (error) {
+        console.log(error);
+       toast.error(error);
+      }
       // Submit the form data or further actions
     }
   };
